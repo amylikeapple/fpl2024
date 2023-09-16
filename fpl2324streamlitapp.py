@@ -175,8 +175,8 @@ for i,x,y,a,b,c,d in zip(list1,list2,list3,list4,list5,list6,list7):
     lower_range = i-0.5
     upper_range = i+0.5
     pos = x
-    filtered_players = master_table.sort_values(by=['Form'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) & (master_table['Position'] == pos)].head(10)
-    filtered_players2 = master_table.sort_values(by=['Form'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) &(master_table['Position'] == pos)].head(15)
+    filtered_players = master_table.sort_values(by=['Form'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) & (master_table['Position'] == pos)].head(10)
+    filtered_players2 = master_table.sort_values(by=['Form'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) &(master_table['Position'] == pos)].head(15)
 
     #avg_points = filtered_players['Form'].mean()
     #avg_points = round(avg_points,1)
@@ -186,24 +186,24 @@ for i,x,y,a,b,c,d in zip(list1,list2,list3,list4,list5,list6,list7):
     pt = round(pt,0)
 
     #PPNext Percenitle
-    pp_pt_1_filtered = master_table.sort_values(by=['PP_GW'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) &(master_table['Position'] == pos)].head(15)
+    pp_pt_1_filtered = master_table.sort_values(by=['PP_GW'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) &(master_table['Position'] == pos)].head(15)
 
     pp_pt_1 = stats.percentileofscore(pp_pt_1_filtered['PP_GW'], d, kind='rank')
 
     #PPNext3 Percentile
-    pp_pt_filtered = master_table.sort_values(by=['PPNext3'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) &(master_table['Position'] == pos)].head(15)
+    pp_pt_filtered = master_table.sort_values(by=['PPNext3'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) &(master_table['Position'] == pos)].head(15)
 
     pp_pt = stats.percentileofscore(pp_pt_filtered['PPNext3'], a, kind='rank')
     pp_pt = round(pp_pt,0)
 
     #Threat Percentile
-    threat_perc_filtered = master_table.sort_values(by=['Threat'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) &(master_table['Position'] == pos)].head(15)
+    threat_perc_filtered = master_table.sort_values(by=['Threat'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) &(master_table['Position'] == pos)].head(15)
 
     threat_perc_pt = stats.percentileofscore(threat_perc_filtered['Threat'], b, kind='rank')
     threat_perc_pt = round(threat_perc_pt,0)
 
     #Creativity Percentile
-    creativity_perc_filtered = master_table.sort_values(by=['Creativity'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) &(master_table['Position'] == pos)].head(15)
+    creativity_perc_filtered = master_table.sort_values(by=['Creativity'],ascending=False)[(master_table['Current Price'].between(lower_range,upper_range)) &(master_table['Position'] == pos)].head(15)
 
     creativity_perc_pt = stats.percentileofscore(creativity_perc_filtered['Creativity'], c, kind='rank')
     creativity_perc_pt = round(creativity_perc_pt,0)
@@ -272,7 +272,7 @@ upper_range = player_to_transfer_1_df.iloc[0][4] + 0.5
 lower_range = player_to_transfer_1_df.iloc[0][4] - 2
 pos = player_to_transfer_1_df.iloc[0][2]
 
-options = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range,upper_range, inclusive=True)) & (master_table['Position'] == pos)].head(10)
+options = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range,upper_range)) & (master_table['Position'] == pos)].head(10)
 
 options = options[['ID','Name', 'Position', 'Team_x',
                     'Current Price','Form','Influence', 'Creativity',
@@ -331,7 +331,7 @@ upper_range2 = player_to_transfer_2_df.iloc[0][4] + 0.5
 lower_range2 = player_to_transfer_2_df.iloc[0][4] - 2
 pos2 = player_to_transfer_2_df.iloc[0][2]
 
-options2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range2,upper_range2, inclusive=True)) & (master_table['Position'] == pos2)].head(10)
+options2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range2,upper_range2)) & (master_table['Position'] == pos2)].head(10)
 
 options2 = options2[['ID','Name', 'Position', 'Team_x',
                     'Current Price','Form','Influence', 'Creativity',
@@ -403,7 +403,7 @@ price_1_pos = st.selectbox(
 upper_range_price_1 = price_1
 lower_range_price_1 = price_1 - 2
 
-options_price_1 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_1,upper_range_price_1, inclusive=True)) & (master_table['Position'] == price_1_pos)].head(10)
+options_price_1 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_1,upper_range_price_1)) & (master_table['Position'] == price_1_pos)].head(10)
 
 options_price_1 = options_price_1[['ID','Name', 'Position', 'Team_x',
                     'Current Price','Form','Influence', 'Creativity',
@@ -452,7 +452,7 @@ price_2_pos = st.selectbox(
 upper_range_price_2 = remaining_price
 lower_range_price_2 = remaining_price - 2
 
-options_price_2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_2,upper_range_price_2, inclusive=True)) & (master_table['Position'] == price_1_pos)].head(10)
+options_price_2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_2,upper_range_price_2)) & (master_table['Position'] == price_1_pos)].head(10)
 
 options_price_2 = options_price_2[['ID','Name', 'Position', 'Team_x',
                     'Current Price','Form','Influence', 'Creativity',
