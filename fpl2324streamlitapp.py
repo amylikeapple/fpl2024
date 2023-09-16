@@ -2,7 +2,7 @@
 import pandas as pd
 from scipy import stats
 import requests
-import plotly_express as px
+import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import numpy as np
