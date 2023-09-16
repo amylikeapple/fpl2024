@@ -240,7 +240,7 @@ with st.expander('⬇️ Column Definitions'):
     st.text("PP3_%_15 = Player PPNext3 percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better that will give you points")
 
 st.dataframe(
-    weekly_table.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']]).set_precision(2)
+    weekly_table.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']])
 )
 # %%
 #Player To Transfer
@@ -249,7 +249,7 @@ index_select = p.iloc[0].name - 1
 index_select = index_select.tolist()
 
 st.text('Suggested Players To Transfer')
-st.dataframe(p.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']]).set_precision(2))
+st.dataframe(p.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']]))
 
 st.header('Step 2A: Assess potential replacements by selected players')
 
@@ -313,7 +313,7 @@ options['xGA per 90'] = xga_data_list
 
 
 st.text(f'Suggested Transfers For {player_to_transfer_1}')
-st.dataframe(options.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]).set_precision(2))
+st.dataframe(options.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
 # %%
 player_to_transfer_2 = st.selectbox(
     '2nd Player to Transfer',
@@ -371,7 +371,7 @@ options2['xGA per 90'] = xga_data_list2
 
 
 st.text(f'Suggested Transfers For {player_to_transfer_2}')
-st.dataframe(options2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]).set_precision(2))
+st.dataframe(options2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
 
 
 #Give the option to customize price options
@@ -439,7 +439,7 @@ options_price_1['xG per 90'] = xg_data_list3
 options_price_1['xA per 90'] = xa_data_list3
 options_price_1['xGA per 90'] = xga_data_list3   
 
-st.dataframe(options_price_1.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]).set_precision(2))
+st.dataframe(options_price_1.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
 
 st.text('Suggested Replacements for Player 2')
 
@@ -489,7 +489,7 @@ options_price_2['xA per 90'] = xa_data_list4
 options_price_2['xGA per 90'] = xga_data_list4 
 
 
-st.dataframe(options_price_2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]).set_precision(2))
+st.dataframe(options_price_2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
 
 #%%
 max_potential_pp3 = options_price_1.iloc[0][12] + options_price_2.iloc[0][12]
@@ -509,3 +509,4 @@ st.text('Breakdown of potential points over the next 3 GW by team')
 st.text('Crop to zoom in. Hover for name and price. Double click to reset graph')
 fig2 = px.violin(master_table[master_table['PPNext3'] > 10], y='PPNext3',hover_data=['Name','Current Price'],points='all',box=True,color='Team_x')
 st.plotly_chart(fig2, use_container_width=True)
+# %%
