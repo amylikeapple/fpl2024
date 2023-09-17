@@ -497,7 +497,7 @@ price_2_pos = st.selectbox(
 upper_range_price_2 = remaining_price
 lower_range_price_2 = remaining_price - 2
 
-options_price_2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_2,upper_range_price_2)) & (master_table['Position'] == price_1_pos)].head(10)
+options_price_2 = master_table.sort_values(['PPNext3','Prob. of Appearring'],ascending= [False,False])[(master_table['Current Price'].between(lower_range_price_2,upper_range_price_2)) & (master_table['Position'] == price_2_pos)].head(10)
 
 options_price_2 = options_price_2[['ID','Name', 'Position', 'Team_x',
                     'Current Price','Form','Influence', 'Creativity',
