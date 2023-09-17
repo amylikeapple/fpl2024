@@ -239,9 +239,28 @@ with st.expander('⬇️ Column Definitions'):
     st.text('PPNext3: Predicted points in the next 3 gameweeks')
     st.text("PP3_%_15 = Player PPNext3 percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better that will give you points")
 
-weekly_table_style = weekly_table.style\
+weekly_table_style = weekly_table[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
                         .format(precision=2)\
-                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']])\
+                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form','Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
+
+st.subheader("Quick Insights & Suggestions")
+
+analysis =weekly_table.sort_values(['Form_%_15','Current Price'],ascending=[True,False])
+
+if analysis['Form_%_15'].min() < 30:
+    st.text(f"Your team has really suffered from {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket. If their predicted points are low, prioritize transferring them.")
+else:
+    st.text(f"You should consider transferring {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket")
+
+analysis2 = weekly_table.loc[(weekly_table['Current Price'] > 5.0) & (weekly_table['Prob. of Appearring'] < 0.85)].sort_values(['Form_%_15','Current Price'],ascending=[True,False])
+
+if 1 >= len(analysis2) > 0:
+    st.text(f"You should particularly focus on {analysis2.iloc[0][1]} as he also has a low probability of appearing - not ideal for a player worth more than 5mil")
+elif 2 >= len(analysis2) > 0:
+    st.text(f"You should particularly focus on {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they also have a low probability of appearing - not ideal for a players worth more than 5mil")
+elif len(analysis2) == 0:
+    st.text(" ")
+
                         
 st.dataframe(
     weekly_table_style,
@@ -252,8 +271,18 @@ p =weekly_table.loc[(weekly_table['Current Price'] > 4.5) & (weekly_table['Prob.
 index_select = p.iloc[0].name - 1
 index_select = index_select.tolist()
 
-st.text('Suggested Players To Transfer')
-st.dataframe(p.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']]))
+st.subheader('Suggested Players To Transfer')
+
+if len(p) == 0:
+    st.text('You have no important players to transfer this week!')
+else:
+    st.text('These players have been suggested as they have low predicted points and probability of appearing')
+
+p_style = p[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
+                        .format(precision=2)\
+                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form','Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
+
+st.dataframe(p_style)
 
 st.header('Step 2A: Assess potential replacements by selected players')
 
@@ -315,9 +344,12 @@ options['xA per 90'] = xa_data_list
 options['xGA per 90'] = xga_data_list       
 
 
+options_style = options.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
 
-st.text(f'Suggested Transfers For {player_to_transfer_1}')
-st.dataframe(options.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
+st.text(f'Suggested Transfers For {player_to_transfer_1}, added in the first row for comparison.')
+st.dataframe(options_style)
 # %%
 player_to_transfer_2 = st.selectbox(
     '2nd Player to Transfer',
@@ -373,9 +405,12 @@ options2['xG per 90'] = xg_data_list2
 options2['xA per 90'] = xa_data_list2
 options2['xGA per 90'] = xga_data_list2       
 
+options2_style = options2.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
 
-st.text(f'Suggested Transfers For {player_to_transfer_2}')
-st.dataframe(options2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
+st.text(f'Suggested Transfers For {player_to_transfer_2}, added in the first row for comparison.')
+st.dataframe(options2_style)
 
 
 #Give the option to customize price options
@@ -441,9 +476,15 @@ for i in xg_players3:
 
 options_price_1['xG per 90'] = xg_data_list3
 options_price_1['xA per 90'] = xa_data_list3
-options_price_1['xGA per 90'] = xga_data_list3   
+options_price_1['xGA per 90'] = xga_data_list3
 
-st.dataframe(options_price_1.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
+
+options_price_1_style = options_price_1.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+
+
+st.dataframe(options_price_1_style)
 
 st.text('Suggested Replacements for Player 2')
 
@@ -493,7 +534,12 @@ options_price_2['xA per 90'] = xa_data_list4
 options_price_2['xGA per 90'] = xga_data_list4 
 
 
-st.dataframe(options_price_2.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']]))
+options_price_2_style = options_price_2.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+
+
+st.dataframe(options_price_2_style)
 
 #%%
 max_potential_pp3 = options_price_1.iloc[0][12] + options_price_2.iloc[0][12]
@@ -507,10 +553,12 @@ st.header('Step 3: Keep Updated On Macro Trends in FPL!')
 st.text('Breakdown of potential points over the next 3 GW by position')
 st.text('Crop to zoom in. Hover for name and price. Double click to reset graph')
 fig1 = px.violin(master_table[master_table['PPNext3'] > 10], y='PPNext3',hover_data=['Name','Current Price'],points='all',box=True,color='Position')
-st.plotly_chart(fig1, use_container_width=True)
+with st.expander('⬇️ Potential Points By Position'):
+    st.plotly_chart(fig1, use_container_width=True)
 
 st.text('Breakdown of potential points over the next 3 GW by team')
 st.text('Crop to zoom in. Hover for name and price. Double click to reset graph')
 fig2 = px.violin(master_table[master_table['PPNext3'] > 10], y='PPNext3',hover_data=['Name','Current Price'],points='all',box=True,color='Team_x')
-st.plotly_chart(fig2, use_container_width=True)
+with st.expander('⬇️ Potential Points By Team'):
+    st.plotly_chart(fig2, use_container_width=True)
 # %%
