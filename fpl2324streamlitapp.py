@@ -221,7 +221,7 @@ weekly_table['Threat_%_15'] = threat_perc
 weekly_table['Crtvty_%_15'] = creativity_perc
 
 weekly_table = weekly_table[['element','Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15', 'Influence','Threat','Threat_%_15','Creativity','Crtvty_%_15',
-                             'Merit','PP_GW','Next_GW_%_15', 'PPNext2', 'PPNext3','PP3_%_15', 'Selected By %','Prob. of Appearring']]    
+                             'Merit','PP_GW','Next_GW_%_15', 'PPNext2', 'PPNext3','PP3_%_15', 'Selected By %','Prob. of Appearring']]
 
 # %%
 st.header('Step 1: Assess your Gameweek Performance')
@@ -239,8 +239,12 @@ with st.expander('⬇️ Column Definitions'):
     st.text('PPNext3: Predicted points in the next 3 gameweeks')
     st.text("PP3_%_15 = Player PPNext3 percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better that will give you points")
 
+weekly_table_style = weekly_table.style\
+                        .format(precision=2)\
+                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']])\
+                        
 st.dataframe(
-    weekly_table.style.background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Form_%_15','Threat_%_15','Crtvty_%_15','Next_GW_%_15','PP3_%_15','Prob. of Appearring']])
+    weekly_table_style,
 )
 # %%
 #Player To Transfer
