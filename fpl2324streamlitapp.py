@@ -248,16 +248,20 @@ st.subheader("Quick Insights & Suggestions")
 analysis =weekly_table.sort_values(['Form_%_15','Current Price'],ascending=[True,False])
 
 if analysis['Form_%_15'].min() < 30:
-    st.text(f"Your team has really suffered from {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket. If their predicted points are low, prioritize transferring them.")
+    st.text(f"Your team has really suffered from {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket. \nIf their predicted points are low, prioritize transferring them.")
 else:
     st.text(f"You should consider transferring {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket")
 
-analysis2 = weekly_table.loc[(weekly_table['Current Price'] > 5.0) & (weekly_table['Prob. of Appearring'] < 0.85)].sort_values(['Form_%_15','Current Price'],ascending=[True,False])
+analysis2 = weekly_table.loc[(weekly_table['Current Price'] >= 4.7) & (weekly_table['Prob. of Appearring'] <= 0.85) & (weekly_table['PP3_%_15'] < 0.5)].sort_values(['Prob. of Appearring','PP3_%_15','Current Price'],ascending=[True,True,False])
 
 if 1 >= len(analysis2) > 0:
-    st.text(f"You should particularly focus on {analysis2.iloc[0][1]} as he also has a low probability of appearing - not ideal for a player worth more than 5mil")
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} as he has a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
 elif 2 >= len(analysis2) > 0:
-    st.text(f"You should particularly focus on {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they also have a low probability of appearing - not ideal for a players worth more than 5mil")
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they have a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
+elif 3 >= len(analysis2) > 0:
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]}, {analysis2.iloc[1][1]} and {analysis2.iloc[2][1]} as they have a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
+elif len(analysis2) > 3:
+    st.text("You should consider wildcarding, you have too many weak points in your team.")
 elif len(analysis2) == 0:
     st.text(" ")
 
@@ -267,7 +271,7 @@ st.dataframe(
 )
 # %%
 #Player To Transfer
-p =weekly_table.loc[(weekly_table['Current Price'] > 4.5) & (weekly_table['Prob. of Appearring'] < 0.85)].sort_values(['PP3_%_15','Prob. of Appearring'],ascending=[True,True])
+p =weekly_table.loc[(weekly_table['Current Price'] > 4.5) & (weekly_table['Prob. of Appearring'] <= 0.85)].sort_values(['PP3_%_15','Prob. of Appearring','Current Price'],ascending=[True,True,False])
 index_select = p.iloc[0].name - 1
 index_select = index_select.tolist()
 
@@ -276,7 +280,7 @@ st.subheader('Suggested Players To Transfer')
 if len(p) == 0:
     st.text('You have no important players to transfer this week!')
 else:
-    st.text('These players have been suggested as they have low predicted points and probability of appearing')
+    st.text('This list players have been shortlisted as they have low predicted points + probability of appearing')
 
 p_style = p[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
                         .format(precision=2)\
@@ -320,36 +324,105 @@ xg_data_list = []
 xa_data_list = []
 xga_data_list = []
 xg_players = list(options['element'])
-
+dif1_list=[]
+home1_list = []
+dif2_list=[]
+home2_list = []
+dif3_list=[]
+home3_list = []
 
 for i in xg_players:
     str = 'https://fantasy.premierleague.com/api/element-summary/{}/'
     url = str.format(i)
     with requests.get(url) as f:
         d = f.json()
-    d = pd.json_normalize(d['history'])
-    d['expected_goals'] = pd.to_numeric(d['expected_goals'])
-    d['expected_assists'] = pd.to_numeric(d['expected_assists'])
-    d['expected_goals_conceded'] = pd.to_numeric(d['expected_goals_conceded'])
-    xg = d['expected_goals'].sum()/(d['minutes'].sum()/90)
-    xa = d['expected_assists'].sum()/(d['minutes'].sum()/90)
-    xga = d['expected_goals_conceded'].sum()/(d['minutes'].sum()/90)
+    e = pd.json_normalize(d['history'])
+    e['expected_goals'] = pd.to_numeric(e['expected_goals'])
+    e['expected_assists'] = pd.to_numeric(e['expected_assists'])
+    e['expected_goals_conceded'] = pd.to_numeric(e['expected_goals_conceded'])
+    xg = e['expected_goals'].sum()/(e['minutes'].sum()/90)
+    xa = e['expected_assists'].sum()/(e['minutes'].sum()/90)
+    xga = e['expected_goals_conceded'].sum()/(e['minutes'].sum()/90)
+    f = pd.json_normalize(d['fixtures'])
+    dif1 = f.loc[0][13]
+    home1 = f.loc[0][12]
+    dif2 = f.loc[1][13]
+    home2 = f.loc[1][12]
+    dif3 = f.loc[2][13]
+    home3 = f.loc[2][12]
+    
 
     xg_data_list.append(xg)
     xa_data_list.append(xa)
     xga_data_list.append(xga)
+    dif1_list.append(dif1)
+    home1_list.append(home1)
+    dif2_list.append(dif2)
+    home2_list.append(home2)
+    dif3_list.append(dif3)
+    home3_list.append(home3)
 
 options['xG per 90'] = xg_data_list
 options['xA per 90'] = xa_data_list
-options['xGA per 90'] = xga_data_list       
+options['xGA per 90'] = xga_data_list     
+options['GW1_Diff'] = dif1_list
+options['GW1_Home?'] = home1_list
+options['GW2_Diff'] = dif2_list
+options['GW2_Home?'] = home2_list
+options['GW3_Diff'] = dif3_list
+options['GW3_Home?'] = home3_list      
 
 
-options_style = options.style\
-                    .format(precision=2)\
-                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+#options_style = options.style\
+#                    .format(precision=2)\
+#                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring','xG per 90','xA per 90','xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff']])
 
 st.text(f'Suggested Transfers For {player_to_transfer_1}, added in the first row for comparison.')
-st.dataframe(options_style)
+table_view = st.radio(
+    "Select your view:",
+    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    index=1,
+    key=1
+)
+if table_view == 'All':
+    options_style = options.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring','xG per 90','xA per 90','xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_style)
+elif table_view == 'ICT + Form + xG':
+    options_style = options[['Name','Team_x','Current Price','Form','Threat','xG per 90','Creativity','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
+    st.dataframe(options_style)
+elif table_view == 'Predicted Points + FDR':
+    options_style = options[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_style)
+elif table_view == 'xG Data':
+    options_style = options[['Name','Team_x','Current Price','xG per 90','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
+    st.dataframe(options_style)
+elif table_view == 'FDR + Home/Away':
+    options_style = options[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
+    st.dataframe(options_style)
+
+
+#if table_view == 'All':
+#    st.dataframe(options_style)
+#elif table_view == 'ICT + Form':
+#    st.dataframe(options_style[['Price','Form','Influence','Creativity','Threat']])
+#elif table_view == 'Predicted Points':
+#    st.dataframe(options_style[['Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. Of Appearring']])
+#elif table_view == 'xG Data':
+#    st.dataframe(options_style[['Price','xG per 90','xA per 90','xGA per 90']])
+#elif table_view == 'FDR':
+#    st.dataframe(options_style[['Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']])
 # %%
 player_to_transfer_2 = st.selectbox(
     '2nd Player to Transfer',
@@ -382,6 +455,12 @@ xg_data_list2 = []
 xa_data_list2 = []
 xga_data_list2 = []
 xg_players2 = list(options2['element'])
+dif1_list2=[]
+home1_list2 = []
+dif2_list2=[]
+home2_list2 = []
+dif3_list2=[]
+home3_list2 = []
 
 
 for i in xg_players2:
@@ -389,28 +468,79 @@ for i in xg_players2:
     url = str.format(i)
     with requests.get(url) as f:
         d = f.json()
-    d = pd.json_normalize(d['history'])
-    d['expected_goals'] = pd.to_numeric(d['expected_goals'])
-    d['expected_assists'] = pd.to_numeric(d['expected_assists'])
-    d['expected_goals_conceded'] = pd.to_numeric(d['expected_goals_conceded'])
-    xg = d['expected_goals'].sum()/(d['minutes'].sum()/90)
-    xa = d['expected_assists'].sum()/(d['minutes'].sum()/90)
-    xga = d['expected_goals_conceded'].sum()/(d['minutes'].sum()/90)
+    e = pd.json_normalize(d['history'])
+    e['expected_goals'] = pd.to_numeric(e['expected_goals'])
+    e['expected_assists'] = pd.to_numeric(e['expected_assists'])
+    e['expected_goals_conceded'] = pd.to_numeric(e['expected_goals_conceded'])
+    xg = e['expected_goals'].sum()/(e['minutes'].sum()/90)
+    xa = e['expected_assists'].sum()/(e['minutes'].sum()/90)
+    xga = e['expected_goals_conceded'].sum()/(e['minutes'].sum()/90)
+    f = pd.json_normalize(d['fixtures'])
+    dif1 = f.loc[0][13]
+    home1 = f.loc[0][12]
+    dif2 = f.loc[1][13]
+    home2 = f.loc[1][12]
+    dif3 = f.loc[2][13]
+    home3 = f.loc[2][12]
 
     xg_data_list2.append(xg)
     xa_data_list2.append(xa)
     xga_data_list2.append(xga)
+    dif1_list2.append(dif1)
+    home1_list2.append(home1)
+    dif2_list2.append(dif2)
+    home2_list2.append(home2)
+    dif3_list2.append(dif3)
+    home3_list2.append(home3)
 
 options2['xG per 90'] = xg_data_list2
 options2['xA per 90'] = xa_data_list2
-options2['xGA per 90'] = xga_data_list2       
+options2['xGA per 90'] = xga_data_list2
+options2['GW1_Diff'] = dif1_list2
+options2['GW1_Home?'] = home1_list2
+options2['GW2_Diff'] = dif2_list2
+options2['GW2_Home?'] = home2_list2
+options2['GW3_Diff'] = dif3_list2
+options2['GW3_Home?'] = home3_list2         
 
-options2_style = options2.style\
-                    .format(precision=2)\
-                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+#options2_style = options2.style\
+#                    .format(precision=2)\
+#                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
 
 st.text(f'Suggested Transfers For {player_to_transfer_2}, added in the first row for comparison.')
-st.dataframe(options2_style)
+table_view2 = st.radio(
+    "Select your view:",
+    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    index=1,
+    key=2
+)
+if table_view2 == 'All':
+    options2_style = options2.style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring','xG per 90','xA per 90','xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options2_style)
+elif table_view2 == 'ICT + Form + xG':
+    options2_style = options2[['Name','Team_x','Current Price','Form','Threat','xG per 90','Creativity','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
+    st.dataframe(options2_style)
+elif table_view2 == 'Predicted Points + FDR':
+    options2_style = options2[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options2_style)
+elif table_view2 == 'xG Data':
+    options2_style = options2[['Name','Team_x','Current Price','xG per 90','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
+    st.dataframe(options2_style)
+elif table_view2 == 'FDR + Home/Away':
+    options2_style = options2[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
+    st.dataframe(options2_style)
 
 
 #Give the option to customize price options
@@ -455,6 +585,12 @@ xg_data_list3 = []
 xa_data_list3 = []
 xga_data_list3 = []
 xg_players3 = list(options_price_1['element'])
+dif1_list3=[]
+home1_list3 = []
+dif2_list3=[]
+home2_list3 = []
+dif3_list3=[]
+home3_list3 = []
 
 
 for i in xg_players3:
@@ -462,29 +598,82 @@ for i in xg_players3:
     url = str.format(i)
     with requests.get(url) as f:
         d = f.json()
-    d = pd.json_normalize(d['history'])
-    d['expected_goals'] = pd.to_numeric(d['expected_goals'])
-    d['expected_assists'] = pd.to_numeric(d['expected_assists'])
-    d['expected_goals_conceded'] = pd.to_numeric(d['expected_goals_conceded'])
-    xg = d['expected_goals'].sum()/(d['minutes'].sum()/90)
-    xa = d['expected_assists'].sum()/(d['minutes'].sum()/90)
-    xga = d['expected_goals_conceded'].sum()/(d['minutes'].sum()/90)
+    e = pd.json_normalize(d['history'])
+    e['expected_goals'] = pd.to_numeric(e['expected_goals'])
+    e['expected_assists'] = pd.to_numeric(e['expected_assists'])
+    e['expected_goals_conceded'] = pd.to_numeric(e['expected_goals_conceded'])
+    xg = e['expected_goals'].sum()/(e['minutes'].sum()/90)
+    xa = e['expected_assists'].sum()/(e['minutes'].sum()/90)
+    xga = e['expected_goals_conceded'].sum()/(e['minutes'].sum()/90)
+    f = pd.json_normalize(d['fixtures'])
+    dif1 = f.loc[0][13]
+    home1 = f.loc[0][12]
+    dif2 = f.loc[1][13]
+    home2 = f.loc[1][12]
+    dif3 = f.loc[2][13]
+    home3 = f.loc[2][12]
 
     xg_data_list3.append(xg)
     xa_data_list3.append(xa)
     xga_data_list3.append(xga)
+    dif1_list3.append(dif1)
+    home1_list3.append(home1)
+    dif2_list3.append(dif2)
+    home2_list3.append(home2)
+    dif3_list3.append(dif3)
+    home3_list3.append(home3)
 
 options_price_1['xG per 90'] = xg_data_list3
 options_price_1['xA per 90'] = xa_data_list3
 options_price_1['xGA per 90'] = xga_data_list3
+options_price_1['GW1_Diff'] = dif1_list3
+options_price_1['GW1_Home?'] = home1_list3
+options_price_1['GW2_Diff'] = dif2_list3
+options_price_1['GW2_Home?'] = home2_list3
+options_price_1['GW3_Diff'] = dif3_list3
+options_price_1['GW3_Home?'] = home3_list3
 
-
-options_price_1_style = options_price_1.style\
+table_view3 = st.radio(
+    "Select your view:",
+    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    index=1,
+    key=3
+)
+if table_view3 == 'All':
+    options_price_1_style = options_price_1.style\
                     .format(precision=2)\
-                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring','xG per 90','xA per 90','xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_price_1_style)
+elif table_view3 == 'ICT + Form + xG':
+    options_price_1_style = options_price_1[['Name','Team_x','Current Price','Form','Threat','xG per 90','Creativity','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
+    st.dataframe(options_price_1_style)
+elif table_view3 == 'Predicted Points + FDR':
+    options_price_1_style = options_price_1[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_price_1_style)
+elif table_view3 == 'xG Data':
+    options_price_1_style = options_price_1[['Name','Team_x','Current Price','xG per 90','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
+    st.dataframe(options_price_1_style)
+elif table_view3 == 'FDR + Home/Away':
+    options_price_1_style = options_price_1[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
+    st.dataframe(options_price_1_style)
 
 
-st.dataframe(options_price_1_style)
+#options_price_1_style = options_price_1.style\
+#                   .format(precision=2)\
+#                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+
+
+#st.dataframe(options_price_1_style)
 
 st.text('Suggested Replacements for Player 2')
 
@@ -510,6 +699,12 @@ xg_data_list4 = []
 xa_data_list4 = []
 xga_data_list4 = []
 xg_players4 = list(options_price_2['element'])
+dif1_list4=[]
+home1_list4 = []
+dif2_list4=[]
+home2_list4 = []
+dif3_list4=[]
+home3_list4 = []
 
 
 for i in xg_players4:
@@ -517,32 +712,98 @@ for i in xg_players4:
     url = str.format(i)
     with requests.get(url) as f:
         d = f.json()
-    d = pd.json_normalize(d['history'])
-    d['expected_goals'] = pd.to_numeric(d['expected_goals'])
-    d['expected_assists'] = pd.to_numeric(d['expected_assists'])
-    d['expected_goals_conceded'] = pd.to_numeric(d['expected_goals_conceded'])
-    xg = d['expected_goals'].sum()/(d['minutes'].sum()/90)
-    xa = d['expected_assists'].sum()/(d['minutes'].sum()/90)
-    xga = d['expected_goals_conceded'].sum()/(d['minutes'].sum()/90)
+    e = pd.json_normalize(d['history'])
+    e['expected_goals'] = pd.to_numeric(e['expected_goals'])
+    e['expected_assists'] = pd.to_numeric(e['expected_assists'])
+    e['expected_goals_conceded'] = pd.to_numeric(e['expected_goals_conceded'])
+    xg = e['expected_goals'].sum()/(e['minutes'].sum()/90)
+    xa = e['expected_assists'].sum()/(e['minutes'].sum()/90)
+    xga = e['expected_goals_conceded'].sum()/(e['minutes'].sum()/90)
+    f = pd.json_normalize(d['fixtures'])
+    dif1 = f.loc[0][13]
+    home1 = f.loc[0][12]
+    dif2 = f.loc[1][13]
+    home2 = f.loc[1][12]
+    dif3 = f.loc[2][13]
+    home3 = f.loc[2][12]
 
     xg_data_list4.append(xg)
     xa_data_list4.append(xa)
     xga_data_list4.append(xga)
+    dif1_list4.append(dif1)
+    home1_list4.append(home1)
+    dif2_list4.append(dif2)
+    home2_list4.append(home2)
+    dif3_list4.append(dif3)
+    home3_list4.append(home3)
 
 options_price_2['xG per 90'] = xg_data_list4
 options_price_2['xA per 90'] = xa_data_list4
-options_price_2['xGA per 90'] = xga_data_list4 
+options_price_2['xGA per 90'] = xga_data_list4
+options_price_2['GW1_Diff'] = dif1_list4
+options_price_2['GW1_Home?'] = home1_list4
+options_price_2['GW2_Diff'] = dif2_list4
+options_price_2['GW2_Home?'] = home2_list4
+options_price_2['GW3_Diff'] = dif3_list4
+options_price_2['GW3_Home?'] = home3_list4
 
-
-options_price_2_style = options_price_2.style\
+table_view4 = st.radio(
+    "Select your view:",
+    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    index=1,
+    key=4
+)
+if table_view4 == 'All':
+    options_price_2_style = options_price_2.style\
                     .format(precision=2)\
-                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring','xG per 90','xA per 90','xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_price_2_style)
+elif table_view4 == 'ICT + Form + xG':
+    options_price_2_style = options_price_2[['Name','Team_x','Current Price','Form','Threat','xG per 90','Creativity','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
+    st.dataframe(options_price_2_style)
+elif table_view4 == 'Predicted Points + FDR':
+    options_price_2_style = options_price_2[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
+                    .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['GW1_Diff','GW2_Diff','GW3_Diff']])
+    st.dataframe(options_price_2_style)
+elif table_view4 == 'xG Data':
+    options_price_2_style = options_price_2[['Name','Team_x','Current Price','xG per 90','xA per 90','xGA per 90']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
+    st.dataframe(options_price_2_style)
+elif table_view4 == 'FDR + Home/Away':
+    options_price_2_style = options_price_2[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
+                    .format(precision=2)\
+                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
+    st.dataframe(options_price_2_style)
 
 
-st.dataframe(options_price_2_style)
+
+#options_price_2_style = options_price_2.style\
+#                    .format(precision=2)\
+#                    .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Threat','Creativity','PP_GW','PPNext3','Prob. of Appearring']])
+
+
+#st.dataframe(options_price_2_style)
 
 #%%
-max_potential_pp3 = options_price_1.iloc[0][12] + options_price_2.iloc[0][12]
+selected_player_1 = st.selectbox(
+    'Chosen Player 1',
+    list(options_price_1['Name']),
+    index=0
+)
+
+selected_player_2 = st.selectbox(
+    'Chosen Player 2',
+    list(options_price_2['Name']),
+    index=0
+)
+
+max_potential_pp3 = options_price_1[options_price_1['Name'] == selected_player_1].iloc[0][12] + options_price_2[options_price_2['Name'] == selected_player_2].iloc[0][12]
 old_potential_pp3 = player_to_transfer_1_df.iloc[0][12] + player_to_transfer_2_df.iloc[0][12]
 delta_potential_pp3 = max_potential_pp3 - old_potential_pp3
 
