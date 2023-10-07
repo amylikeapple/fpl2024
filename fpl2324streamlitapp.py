@@ -23,19 +23,33 @@ team_id = st.number_input(
     value=6806921
 )
 
+@st.cache_data(ttl=3600)
+def gameweek_auto():
+    url4 = 'https://fantasy.premierleague.com/api/bootstrap-static/'
+    with requests.get(url4) as f:
+        d = f.json()
+    d = pd.json_normalize(d['events'])
+    d = d[d['finished'] == True].tail(1).iloc[0][0]
+    return d
+
+default_gw_value = gameweek_auto()
+
 #%%
 #Ask for Gameweek
 gameweek = st.number_input(
     'Input Gameweek',
     min_value=1,
     max_value=38,
-    value=4
+    value=default_gw_value
 )
+
+#if gameweek - 1 or gameweek +1:
+#    st.cache_data.clear()
 
 gameweek_m_1 = gameweek - 1
 
 #%%
-@st.cache_data
+@st.cache_data(ttl=3600)
 def master_table():
     #Get Master Table
     url = 'https://drive.google.com/file/d/1f-q5duVoamPtC9kZxvyXLPANdcYYzBKE/view?usp=sharing'
@@ -45,7 +59,7 @@ def master_table():
     return df
 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def metrics_data(team_id,gameweek):
     #Get Gameweek Metrics Data
     team_id = team_id
@@ -59,7 +73,7 @@ def metrics_data(team_id,gameweek):
     df2 = pd.json_normalize(df2['entry_history'])
     return df2
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def average_score():
     url3 = 'https://fantasy.premierleague.com/api/bootstrap-static/'
     with requests.get(url3) as f:
@@ -67,7 +81,7 @@ def average_score():
     d = pd.json_normalize(d['events'])
     return d
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def gameweek_data(team_id, gameweek):
     #Get Gameweek Picks
     team_id = team_id
@@ -81,7 +95,7 @@ def gameweek_data(team_id, gameweek):
     df3 = pd.json_normalize(df3['picks'])
     return df3 
 
-@st.cache_data
+@st.cache_data(ttl=3600)
 def metric_data_prev(team_id, gameweek):
     team_id = team_id
     gameweek = gameweek
