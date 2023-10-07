@@ -36,12 +36,13 @@ default_gw_value = gameweek_auto()
 
 #%%
 #Ask for Gameweek
-gameweek = st.number_input(
-    'Input Gameweek',
-    min_value=1,
-    max_value=38,
-    value=default_gw_value
-)
+gameweek = default_gw_value
+#gameweek = st.number_input(
+#    'Input Gameweek',
+#    min_value=1,
+#    max_value=38,
+#    value=default_gw_value
+#)
 
 #if gameweek - 1 or gameweek +1:
 #    st.cache_data.clear()
@@ -239,25 +240,77 @@ weekly_table = weekly_table[['element','Name', 'Position', 'Team_x','Current Pri
 
 # %%
 st.header('Step 1: Assess your Gameweek Performance')
-with st.expander('⬇️ Column Definitions'):
-    st.text('EventPoints = Current gameweek points')
-    st.text('Form = Average points over the past 4 gameweeks')
-    st.text("Form_%_15 = Player form percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better")
-    st.text("Threat = FPL's measurment on how much the player's actions are leading to goals")
-    st.text("Threat_%_15 = Player threat percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better")
-    st.text("Creativity = FPL's measurment on how much the player's actions are leading to assists")
-    st.text("Crtvty_%_15 = Player creativity percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better")
-    st.text("Merit = FPLform's algorithm on how much we can rely on predicted scores based on recent player performance")
-    st.text('PP_GW: Predicted points in the next gameweek')
-    st.text("Next_GW_%_15 = Player potential points percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better that will give you points")
-    st.text('PPNext3: Predicted points in the next 3 gameweeks')
-    st.text("PP3_%_15 = Player PPNext3 percentile rank with respect to the top 15 players within +/- 0.5m range. TLDR - 100% means there's no one better that will give you points")
+with st.expander('⬇️ Column Definitions - Read Me First!'):
+    st.text('1. EventPoints = Current gameweek points')
+    st.text('2. Form = Average points over the past 4 gameweeks')
+    st.markdown("*Heads up! An example of what percentile rank means --> 75.0 = Player is better than 75% of the top 15 players in his price bracket.*")
+    st.text("3. Form_%_15 = Player's form percentile rank based on price. TLDR - 100% means there's no one better.")
+    st.text("4. Threat = FPL's measurement on how much the player's actions are leading to goals")
+    st.text("5. Threat_%_15 = Player threat percentile rank based on price. TLDR - 100% means there's no one better")
+    st.text("6. Creativity = FPL's measurement on how much the player's actions are leading to assists")
+    st.text("7. Crtvty_%_15 = Player creativity percentile rank based on price. TLDR - 100% means there's no one better")
+    st.text("8. Merit = FPLform's algorithm on how much we can rely on predicted scores based on recent player performance")
+    st.text('9. PP_GW: Predicted points in the next gameweek')
+    st.text("10. Next_GW_%_15 = Player PP_GW percentile rank based on price. TLDR - 100% means there's no one better that will give you points")
+    st.text('11. PPNext3: Predicted points in the next 3 gameweeks')
+    st.text("12. PP3_%_15 = Player PPNext3 percentile rank based on price. TLDR - 100% means there's no one better that will give you points")
 
 weekly_table_style = weekly_table[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
                         .format(precision=2)\
-                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form','Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
+                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
 
-st.subheader("Quick Insights & Suggestions")
+st.subheader("Your Gameweek Performance TLDR")
+
+loc_selector = gameweek - 1
+average_score_value = average_score.loc[loc_selector][3]
+your_score_value = metrics_data.loc[0][1]
+average_score_rating = ((your_score_value - average_score_value)/average_score_value)*100
+form_rating = weekly_table.head(11)['Form_%_15'].mean()
+potential_score_rating_1 = weekly_table.sort_values(['PP_GW'],ascending=False).head(11)['Next_GW_%_15'].mean()
+potential_score_rating_3 = weekly_table.sort_values(['PPNext3'],ascending=False).head(11)['PP3_%_15'].mean()
+
+if average_score_rating < 0:
+    st.text(f"You scored {round(average_score_rating,1)}% below the GW average")
+else:
+    st.text(f"You scored {round(average_score_rating,1)}% above the GW average")
+
+#st.text(f"You scored {round(average_score_rating,1)}% below the GW average")
+
+if form_rating >=75:
+    st.text(f"Player Form Rating: {round(form_rating,1)}/100.0 - Above Average. Your players consistently did better!")
+elif 75 > form_rating >= 50  :
+    st.text(f"Player Form Rating: {round(form_rating,1)}/100.0 - Average. Your players did alright, but no significant ground gained.")
+elif 50 > form_rating >= 30:
+    st.text(f"Player Form Rating: {round(form_rating,1)}/100.0 - Below Average. Your players consistently performed poorly.")
+elif form_rating <30:
+    st.text(f"Player Form Rating: {round(form_rating,1)}/100.0 - What were you thinking with your choices!")
+
+#st.text(f"Player Form Rating: {round(form_rating,1)}/100.0")
+if potential_score_rating_1 >= 75:
+    st.text(f"Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Above Average. You don't need transfers!!")
+elif 75 > potential_score_rating_1 >= 50:
+    st.text(f"Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Average. Your next GW predicted point are alright.")
+elif 50 > potential_score_rating_1 >= 30:
+    st.text(f"Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Below Average. You should make some transfers. Refer to suggestions below.")
+elif potential_score_rating_1 <30:
+    st.text(f"Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Critical. You should make some transfers. Refer to suggestions below.")
+
+#st.text(f"Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0")
+
+if potential_score_rating_3 >= 75:
+    st.text(f"Upcoming 3 GW Potential Points Rating: {round(potential_score_rating_3,1)}/100.0 - Above Average. You don't need transfers!!")
+elif 75 > potential_score_rating_3 >= 50:
+    st.text(f"Upcoming 3 GW Potential Points Rating: {round(potential_score_rating_3,1)}/100.0 - Average. Your next 3 GW predicted points are alright. \nKeep a look out in the next few GW for opportunities.")
+elif 50 > potential_score_rating_3 >= 30:
+    st.text(f"Upcoming 3 GW Potential Points Rating: {round(potential_score_rating_3,1)}/100.0 - Below Average. You should make some transfers. Refer to suggestions below.")
+elif potential_score_rating_3 <30:
+    st.text(f"Upcoming 3 GW Potential Points Rating: {round(potential_score_rating_3,1)}/100.0 - Critical. You should make some transfers. Refer to suggestions below.")
+
+#st.text(f"Upcoming 3 GW Potential Points Rating: {round(potential_score_rating_3,1)}/100.0")
+
+st.divider()
+
+st.text('Unpacking Those Numbers In Words:')
 
 analysis =weekly_table.sort_values(['Form_%_15','Current Price'],ascending=[True,False])
 
@@ -269,16 +322,19 @@ else:
 analysis2 = weekly_table.loc[(weekly_table['Current Price'] >= 4.7) & (weekly_table['Prob. of Appearring'] <= 0.85) & (weekly_table['PP3_%_15'] < 0.5)].sort_values(['Prob. of Appearring','PP3_%_15','Current Price'],ascending=[True,True,False])
 
 if 1 >= len(analysis2) > 0:
-    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} as he has a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} as he has a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif 2 >= len(analysis2) > 0:
-    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they have a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif 3 >= len(analysis2) > 0:
-    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]}, {analysis2.iloc[1][1]} and {analysis2.iloc[2][1]} as they have a low probability of appearing +\nlow predicted points in the next 3 gameweeks")
+    st.text(f"You should particularly focus on transferring {analysis2.iloc[0][1]}, {analysis2.iloc[1][1]} and {analysis2.iloc[2][1]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif len(analysis2) > 3:
     st.text("You should consider wildcarding, you have too many weak points in your team.")
 elif len(analysis2) == 0:
     st.text(" ")
 
+st.markdown("*Green = Good, Orange = Average, Red = Poor*")
+
+st.text("")
                         
 st.dataframe(
     weekly_table_style,
@@ -294,11 +350,11 @@ st.subheader('Suggested Players To Transfer')
 if len(p) == 0:
     st.text('You have no important players to transfer this week!')
 else:
-    st.text('This list players have been shortlisted as they have low predicted points + probability of appearing')
+    st.text('These players have been shortlisted as they have low predicted points and/or probability of appearing')
 
 p_style = p[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
                         .format(precision=2)\
-                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form','Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
+                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
 
 st.dataframe(p_style)
 
@@ -394,7 +450,7 @@ options['GW3_Home?'] = home3_list
 st.text(f'Suggested Transfers For {player_to_transfer_1}, added in the first row for comparison.')
 table_view = st.radio(
     "Select your view:",
-    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    ['All','Predicted Points + Fixture Difficulty Rating','ICT + Form + xG','xG Data','Fixture Difficulty Rating + Home/Away'],
     index=1,
     key=1
 )
@@ -409,7 +465,7 @@ elif table_view == 'ICT + Form + xG':
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
                     .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
     st.dataframe(options_style)
-elif table_view == 'Predicted Points + FDR':
+elif table_view == 'Predicted Points + Fixture Difficulty Rating':
     options_style = options[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
@@ -420,7 +476,7 @@ elif table_view == 'xG Data':
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
     st.dataframe(options_style)
-elif table_view == 'FDR + Home/Away':
+elif table_view == 'Fixture Difficulty Rating + Home/Away':
     options_style = options[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
@@ -435,7 +491,7 @@ elif table_view == 'FDR + Home/Away':
 #    st.dataframe(options_style[['Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. Of Appearring']])
 #elif table_view == 'xG Data':
 #    st.dataframe(options_style[['Price','xG per 90','xA per 90','xGA per 90']])
-#elif table_view == 'FDR':
+#elif table_view == 'Fixture Difficulty Rating':
 #    st.dataframe(options_style[['Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']])
 # %%
 player_to_transfer_2 = st.selectbox(
@@ -524,7 +580,7 @@ options2['GW3_Home?'] = home3_list2
 st.text(f'Suggested Transfers For {player_to_transfer_2}, added in the first row for comparison.')
 table_view2 = st.radio(
     "Select your view:",
-    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    ['All','Predicted Points + Fixture Difficulty Rating','ICT + Form + xG','xG Data','Fixture Difficulty Rating + Home/Away'],
     index=1,
     key=2
 )
@@ -539,7 +595,7 @@ elif table_view2 == 'ICT + Form + xG':
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
                     .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
     st.dataframe(options2_style)
-elif table_view2 == 'Predicted Points + FDR':
+elif table_view2 == 'Predicted Points + Fixture Difficulty Rating':
     options2_style = options2[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
@@ -550,7 +606,7 @@ elif table_view2 == 'xG Data':
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
     st.dataframe(options2_style)
-elif table_view2 == 'FDR + Home/Away':
+elif table_view2 == 'Fixture Difficulty Rating + Home/Away':
     options2_style = options2[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
@@ -649,7 +705,7 @@ options_price_1['GW3_Home?'] = home3_list3
 
 table_view3 = st.radio(
     "Select your view:",
-    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    ['All','Predicted Points + Fixture Difficulty Rating','ICT + Form + xG','xG Data','Fixture Difficulty Rating + Home/Away'],
     index=1,
     key=3
 )
@@ -664,7 +720,7 @@ elif table_view3 == 'ICT + Form + xG':
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
                     .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
     st.dataframe(options_price_1_style)
-elif table_view3 == 'Predicted Points + FDR':
+elif table_view3 == 'Predicted Points + Fixture Difficulty Rating':
     options_price_1_style = options_price_1[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
@@ -675,7 +731,7 @@ elif table_view3 == 'xG Data':
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
     st.dataframe(options_price_1_style)
-elif table_view3 == 'FDR + Home/Away':
+elif table_view3 == 'Fixture Difficulty Rating + Home/Away':
     options_price_1_style = options_price_1[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
@@ -763,7 +819,7 @@ options_price_2['GW3_Home?'] = home3_list4
 
 table_view4 = st.radio(
     "Select your view:",
-    ['All','Predicted Points + FDR','ICT + Form + xG','xG Data','FDR + Home/Away'],
+    ['All','Predicted Points + Fixture Difficulty Rating','ICT + Form + xG','xG Data','Fixture Difficulty Rating + Home/Away'],
     index=1,
     key=4
 )
@@ -778,7 +834,7 @@ elif table_view4 == 'ICT + Form + xG':
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['Creativity','Threat','xG per 90','xA per 90']])\
                     .background_gradient(cmap='Reds', subset=pd.IndexSlice[:,['xGA per 90']])
     st.dataframe(options_price_2_style)
-elif table_view4 == 'Predicted Points + FDR':
+elif table_view4 == 'Predicted Points + Fixture Difficulty Rating':
     options_price_2_style = options_price_2[['Name','Team_x','Current Price','Merit','PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring','GW1_Diff','GW2_Diff','GW3_Diff']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','PPNext2','PPNext3','Selected By %','Prob. of Appearring']])\
@@ -789,7 +845,7 @@ elif table_view4 == 'xG Data':
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['xG per 90','xA per 90','xGA per 90']])
     st.dataframe(options_price_2_style)
-elif table_view4 == 'FDR + Home/Away':
+elif table_view4 == 'Fixture Difficulty Rating + Home/Away':
     options_price_2_style = options_price_2[['Name','Team_x','Current Price','PP_GW','GW1_Diff','GW1_Home?','GW2_Diff','GW2_Home?','GW3_Diff','GW3_Home?','PPNext3']].style\
                     .format(precision=2)\
                     .background_gradient(cmap='RdYlGn', subset=pd.IndexSlice[:,['PP_GW','GW1_Diff','GW2_Diff','GW3_Diff','PPNext3']])
