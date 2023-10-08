@@ -6,6 +6,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import numpy as np
+from st_aggrid import AgGrid
 
 st.set_page_config(
     page_title='FPL 23/24 Team Optimizer',
@@ -256,8 +257,8 @@ with st.expander('⬇️ Column Definitions - Read Me First!'):
     st.text("12. PP3_%_15 = Player PPNext3 percentile rank based on price. TLDR - 100% means there's no one better that will give you points")
 
 weekly_table_style = weekly_table[['Name', 'Position', 'Team_x','Current Price','EventPoints','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
-                        .format(precision=2)\
-                        .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
+                       .format(precision=2)\
+                       .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])\
 
 st.subheader("Your Gameweek Performance TLDR")
 
@@ -337,7 +338,7 @@ st.markdown("*Green = Good, Orange = Average, Red = Poor*")
 st.text("")
                         
 st.dataframe(
-    weekly_table_style,
+    weekly_table_style
 )
 # %%
 #Player To Transfer
