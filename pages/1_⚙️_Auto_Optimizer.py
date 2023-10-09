@@ -278,7 +278,7 @@ def metrics_data(team_id,gameweek):
     return df2 
 
 master_table = master_table()
-master_table = master_table.rename(columns={f'{list(master_table.columns)[50]}':'PP_GW'})
+master_table = master_table.rename(columns={f'{list(master_table.columns)[51]}':'PP_GW'})
 gameweek_data = gameweek_data(team_id,gameweek)
 metrics_data =metrics_data(team_id,gameweek)
 

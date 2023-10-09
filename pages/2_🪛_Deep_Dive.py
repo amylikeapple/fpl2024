@@ -112,7 +112,7 @@ def metric_data_prev(team_id, gameweek):
 
 master_table = master_table()
 #%%
-master_table = master_table.rename(columns={f'{list(master_table.columns)[50]}':'PP_GW'})
+master_table = master_table.rename(columns={f'{list(master_table.columns)[51]}':'PP_GW'})
 metrics_data =metrics_data(team_id,gameweek)
 average_score = average_score()
 gameweek_data = gameweek_data(team_id,gameweek)
@@ -448,10 +448,13 @@ AgGrid(
 )
 # %%
 #Player To Transfer
-p =weekly_table_show.loc[(weekly_table['Current Price'] > 4.5) & (weekly_table['Prob. of Appearring'] <= 0.85)].sort_values(['PP3_%_15','Prob. of Appearring','Current Price'],ascending=[True,True,False])
-index_select = p.iloc[0].name - 1
-index_select = index_select.tolist()
-index_select2 = weekly_table_show.iloc[0].name
+p =weekly_table_show.loc[(weekly_table_show['Current Price'] > 4.5) & (weekly_table_show['Prob. of Appearring'] <= 0.85)].sort_values(['PP3_%_15','Prob. of Appearring','Current Price'],ascending=[True,True,False])
+if len(p) > 0:
+    index_select = p.iloc[0].name - 1
+else:
+    index_select = weekly_table_show.iloc[0].name
+#index_select = index_select.tolist()
+index_select2 = weekly_table_show.iloc[1].name
 
 st.subheader('Suggested Players To Transfer')
 
