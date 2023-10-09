@@ -600,50 +600,6 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     #                   .background_gradient(cmap='RdYlGn',subset=pd.IndexSlice[:,['Form_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']])
     
     #st.write(updated_weekly_table_style)
-    st.subheader('Explore Other Players')
-    options_to_explore = new_data[['Name', 'Position', 'Team_x',
-                        'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
-    gridOptions4 = GridOptionsBuilder.from_dataframe(options_to_explore)
-    gridOptions4.configure_pagination(enabled=True,paginationAutoPageSize=True, paginationPageSize=10)
-    gridOptions4.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 
-                                sorteable=False, width = 100)
-    gridOptions4.configure_column('Position', headerTooltip='Click hamburger to filter and select columns', width = 90, header_name='Pos')
-    #gridOptions4.configure_column('element', headerTooltip='Click hamburger to filter and select columns', width = 50, header_name='ID')
-    gridOptions4.configure_column('Team_x', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='Team')
-    gridOptions4.configure_column('Current Price', headerTooltip='Click hamburger to filter and select columns', width = 50, header_name='$')
-    #gridOptions4.configure_column('Event Points', headerTooltip='Click hamburger to filter and select columns', width = 80, header_name='GW Pts')
-    gridOptions4.configure_column('Form', headerTooltip='Click hamburger to filter and select columns', width = 70, header_name='Form')
-    #gridOptions4.configure_column('Influence', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('Creativity', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('Merit', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('Threat', headerTooltip='Click hamburger to filter and select columns', width = 80)
-    gridOptions4.configure_column('PP_GW', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next GW')
-    gridOptions4.configure_column('PPNext2', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next 2 GW')
-    gridOptions4.configure_column('PPNext3', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next 3 GW',pinned='left')
-    gridOptions4.configure_column('Selected By %', headerTooltip='Click hamburger to filter and select columns', width = 120, header_name='Selected By %')
-    gridOptions4.configure_column('Prob. of Appearring', headerTooltip='Click hamburger to filter and select columns', width = 160, header_name='Prob of Appearring(%)')
-    gridOptions4.configure_column('xG per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('xA per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('xGA per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('GW1_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('GW1_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
-    gridOptions4.configure_column('GW2_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('GW2_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
-    gridOptions4.configure_column('GW3_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
-    gridOptions4.configure_column('GW3_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
-    gridOptions4.configure_columns(['PP_GW'],cellStyle =cellstylejscode3)
-    gridOptions4.configure_columns(['PPNext3'],cellStyle =cellstylejscode4)
-    gridOptions4.configure_columns(['GW1_Diff','GW2_Diff','GW3_Diff'],cellStyle =cellstylejscode5)
-    gridOptions4.configure_columns(['Selected By %'],cellStyle =cellstylejscode6)
-    gridOptions4.configure_columns(['Prob. of Appearring'],cellStyle =cellstylejscode7)
-    gb4 = gridOptions4.build()
-
-    AgGrid(
-        options_to_explore,theme='streamlit', gridOptions=gb4, allow_unsafe_jscode=True,
-    )
-
-
-
 
     st.subheader('Updated Squad Selection')
     options_to_show2 = updated_weekly_table[['Name', 'Position', 'Team_x',
@@ -686,3 +642,44 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
         options_to_show2,theme='streamlit', gridOptions=gb3, allow_unsafe_jscode=True,
     )
 
+    st.subheader('Explore Other Players')
+    options_to_explore = new_data[['Name', 'Position', 'Team_x',
+                        'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
+    gridOptions4 = GridOptionsBuilder.from_dataframe(options_to_explore)
+    gridOptions4.configure_pagination(enabled=True,paginationAutoPageSize=True, paginationPageSize=10)
+    gridOptions4.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 
+                                sorteable=False, width = 100)
+    gridOptions4.configure_column('Position', headerTooltip='Click hamburger to filter and select columns', width = 90, header_name='Pos')
+    #gridOptions4.configure_column('element', headerTooltip='Click hamburger to filter and select columns', width = 50, header_name='ID')
+    gridOptions4.configure_column('Team_x', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='Team')
+    gridOptions4.configure_column('Current Price', headerTooltip='Click hamburger to filter and select columns', width = 50, header_name='$')
+    #gridOptions4.configure_column('Event Points', headerTooltip='Click hamburger to filter and select columns', width = 80, header_name='GW Pts')
+    gridOptions4.configure_column('Form', headerTooltip='Click hamburger to filter and select columns', width = 70, header_name='Form')
+    #gridOptions4.configure_column('Influence', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('Creativity', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('Merit', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('Threat', headerTooltip='Click hamburger to filter and select columns', width = 80)
+    gridOptions4.configure_column('PP_GW', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next GW')
+    gridOptions4.configure_column('PPNext2', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next 2 GW')
+    gridOptions4.configure_column('PPNext3', headerTooltip='Click hamburger to filter and select columns', width = 110, header_name='PP Next 3 GW',pinned='left')
+    gridOptions4.configure_column('Selected By %', headerTooltip='Click hamburger to filter and select columns', width = 120, header_name='Selected By %')
+    gridOptions4.configure_column('Prob. of Appearring', headerTooltip='Click hamburger to filter and select columns', width = 160, header_name='Prob of Appearring(%)')
+    gridOptions4.configure_column('xG per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('xA per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('xGA per 90', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('GW1_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('GW1_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions4.configure_column('GW2_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('GW2_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions4.configure_column('GW3_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
+    gridOptions4.configure_column('GW3_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions4.configure_columns(['PP_GW'],cellStyle =cellstylejscode3)
+    gridOptions4.configure_columns(['PPNext3'],cellStyle =cellstylejscode4)
+    gridOptions4.configure_columns(['GW1_Diff','GW2_Diff','GW3_Diff'],cellStyle =cellstylejscode5)
+    gridOptions4.configure_columns(['Selected By %'],cellStyle =cellstylejscode6)
+    gridOptions4.configure_columns(['Prob. of Appearring'],cellStyle =cellstylejscode7)
+    gb4 = gridOptions4.build()
+
+    AgGrid(
+        options_to_explore,theme='streamlit', gridOptions=gb4, allow_unsafe_jscode=True,
+    )
