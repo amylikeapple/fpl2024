@@ -119,7 +119,7 @@ def optimize_team(weekly_table, new_data, num_replacements, metric, max_selected
         # Updated weekly table after the replacements
         updated_weekly_table = pd.concat([remaining_weekly_players, best_replacements_df], ignore_index=True)
         # Calculate the increase in the chosen metric
-        increase = updated_weekly_table['Adjusted Metric'].sum() - weekly_table['Adjusted Metric'].sum()
+        increase = updated_weekly_table[metric].sum() - weekly_table[metric].sum()
     else:
         updated_weekly_table = remaining_weekly_players.copy()
         increase = 0
@@ -483,7 +483,7 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     st.text(f"Including what's in your bank, you have a total of {round(available_budget,1)} to spend")
 
 
-    options_to_remove = players_to_remove[['Name', 'Position', 'Team_x',
+    options_to_remove = players_to_remove[['Name','PP3_%_15','Next_GW_%_15', 'Position', 'Team_x',
                         'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
     gridOptions = GridOptionsBuilder.from_dataframe(options_to_remove)
     gridOptions.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 
@@ -512,6 +512,9 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     gridOptions.configure_column('GW2_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
     gridOptions.configure_column('GW3_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
     gridOptions.configure_column('GW3_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions.configure_column('Next_GW_%_15', headerTooltip='Click hamburger to filter and select columns', width = 150, header_name='PP Next GW Rank(%)')
+    gridOptions.configure_column('PP3_%_15', headerTooltip='Click hamburger to filter and select columns', width = 160, header_name='PP Next 3 GW Rank(%)')
+    gridOptions.configure_columns(['Next_GW_%_15','PP3_%_15'],cellStyle =cellstylejscode)
     gridOptions.configure_columns(['PP_GW'],cellStyle =cellstylejscode3)
     gridOptions.configure_columns(['PPNext3'],cellStyle =cellstylejscode4)
     gridOptions.configure_columns(['GW1_Diff','GW2_Diff','GW3_Diff'],cellStyle =cellstylejscode5)
@@ -524,7 +527,7 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     )
     
     st.subheader('Players to Transfer In')
-    options_to_show = players_to_add[['Name', 'Position', 'Team_x',
+    options_to_show = players_to_add[['Name', 'PP3_%_15','Next_GW_%_15','Position', 'Team_x',
                         'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
     gridOptions2 = GridOptionsBuilder.from_dataframe(options_to_show)
     gridOptions2.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 
@@ -553,6 +556,9 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     gridOptions2.configure_column('GW2_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
     gridOptions2.configure_column('GW3_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
     gridOptions2.configure_column('GW3_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions2.configure_column('Next_GW_%_15', headerTooltip='Click hamburger to filter and select columns', width = 150, header_name='PP Next GW Rank(%)')
+    gridOptions2.configure_column('PP3_%_15', headerTooltip='Click hamburger to filter and select columns', width = 160, header_name='PP Next 3 GW Rank(%)')
+    gridOptions2.configure_columns(['Next_GW_%_15','PP3_%_15'],cellStyle =cellstylejscode)
     gridOptions2.configure_columns(['PP_GW'],cellStyle =cellstylejscode3)
     gridOptions2.configure_columns(['PPNext3'],cellStyle =cellstylejscode4)
     gridOptions2.configure_columns(['GW1_Diff','GW2_Diff','GW3_Diff'],cellStyle =cellstylejscode5)
@@ -602,8 +608,8 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     #st.write(updated_weekly_table_style)
 
     st.subheader('Updated Squad Selection')
-    options_to_show2 = updated_weekly_table[['Name', 'Position', 'Team_x',
-                        'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
+    options_to_show2 = updated_weekly_table[['Name', 'PP3_%_15', 'Position', 'Team_x',
+                        'Current Price','Merit','PP_GW','Next_GW_%_15', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
     gridOptions3 = GridOptionsBuilder.from_dataframe(options_to_show2)
     gridOptions3.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 
                                 sorteable=False, width = 100)
@@ -631,6 +637,9 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     gridOptions3.configure_column('GW2_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
     gridOptions3.configure_column('GW3_Diff', headerTooltip='Click hamburger to filter and select columns', width = 100)
     gridOptions3.configure_column('GW3_Home?', headerTooltip='Click hamburger to filter and select columns', width = 130)
+    gridOptions3.configure_column('Next_GW_%_15', headerTooltip='Click hamburger to filter and select columns', width = 150, header_name='PP Next GW Rank(%)')
+    gridOptions3.configure_column('PP3_%_15', headerTooltip='Click hamburger to filter and select columns', width = 160, header_name='PP Next 3 GW Rank(%)')
+    gridOptions3.configure_columns(['Next_GW_%_15','PP3_%_15'],cellStyle =cellstylejscode)
     gridOptions3.configure_columns(['PP_GW'],cellStyle =cellstylejscode3)
     gridOptions3.configure_columns(['PPNext3'],cellStyle =cellstylejscode4)
     gridOptions3.configure_columns(['GW1_Diff','GW2_Diff','GW3_Diff'],cellStyle =cellstylejscode5)
@@ -642,7 +651,8 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
         options_to_show2,theme='streamlit', gridOptions=gb3, allow_unsafe_jscode=True,
     )
 
-    st.subheader('Explore Other Players')
+    st.subheader("Don't Like The Suggested Player? Explore Others")
+    st.markdown('*Tip - Filter by intended Position & Price, then click on column header PPNext3 to sort*')
     options_to_explore = new_data[['Name', 'Position', 'Team_x',
                         'Current Price','Merit','PP_GW', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
     gridOptions4 = GridOptionsBuilder.from_dataframe(options_to_explore)
@@ -683,3 +693,4 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     AgGrid(
         options_to_explore,theme='streamlit', gridOptions=gb4, allow_unsafe_jscode=True,
     )
+

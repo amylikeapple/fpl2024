@@ -248,20 +248,6 @@ weekly_table_show = weekly_table[['element','Name', 'Position', 'Team_x','Curren
 
 # %%
 st.header('Step 1: Assess your Gameweek Performance')
-with st.expander('⬇️ Column Definitions - Read Me First!'):
-    st.text('1. GW Points = Current gameweek points')
-    st.text('2. Form = Average points over the past 4 gameweeks')
-    st.markdown("*Heads up! An example of what percentile rank means --> 75.0 = Player is better than 75% of the top 15 players in his price bracket.*")
-    st.text("3. Form Rank (%) = Player's form percentile rank ")
-    st.text("4. Threat = FPL's measurement on how much the player's actions are leading to goals")
-    st.text("5. Threat Rank (%) = Player threat percentile rank.")
-    st.text("6. Creativity = FPL's measurement on how much the player's actions are leading to assists")
-    st.text("7. Crtvty Rank(%) = Player creativity percentile rank.")
-    st.text("8. Merit = FPLform's algorithm on how much we can rely on predicted scores based on recent player performance")
-    st.text('9. PP Next GW: Predicted points in the next gameweek')
-    st.text("10. PP Next GW Rank(%) = Player PP_GW percentile rank.")
-    st.text('11. PP Next 3 GW: Predicted points in the next 3 gameweeks')
-    st.text("12. PP Next 3 GW Rank(%) = Player PPNext3 percentile rank.")
 
 #weekly_table_style = weekly_table[['Name', 'Position', 'Team_x','Current Price','Event Points','Form', 'Form_%_15','Threat_%_15','Crtvty_%_15','PP_GW','Next_GW_%_15','PPNext3','PP3_%_15','Prob. of Appearring']].style\
 #                       .format(precision=2)\
@@ -285,11 +271,11 @@ else:
 #st.text(f"You scored {round(average_score_rating,1)}% below the GW average")
 
 if form_rating >=75:
-    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Above Average. Your players consistently did better!")
+    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Above Average. Your selected players have been doing well in the past 4 GW.")
 elif 75 > form_rating >= 50  :
-    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Average. Your players did alright, but no significant ground gained.")
+    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Average. Your selected players players did alright in the past 4 GW.")
 elif 50 > form_rating >= 30:
-    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Below Average. Your players consistently performed poorly.")
+    st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - Below Average. Your selected players consistently performed poorly in the past 4 GW. \nAnalyze why you selected/transferred them.")
 elif form_rating <30:
     st.text(f"2. Player Form Rating: {round(form_rating,1)}/100.0 - What were you thinking with your choices!")
 
@@ -297,7 +283,7 @@ elif form_rating <30:
 if potential_score_rating_1 >= 75:
     st.text(f"3. Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Above Average. You don't need transfers!!")
 elif 75 > potential_score_rating_1 >= 50:
-    st.text(f"3. Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Average. Your next GW predicted point are alright.")
+    st.text(f"3. Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Average. Your next GW predicted points are alright.")
 elif 50 > potential_score_rating_1 >= 30:
     st.text(f"3. Upcoming GW Potential Points Rating: {round(potential_score_rating_1,1)}/100.0 - Below Average. You should make some transfers. Refer to suggestions below.")
 elif potential_score_rating_1 <30:
@@ -323,20 +309,20 @@ st.markdown('*Unpacking Those Numbers In Words:*')
 analysis =weekly_table.sort_values(['Form_%_15','Current Price'],ascending=[True,False])
 
 if analysis['Form_%_15'].min() < 30:
-    st.text(f"1. Your team has really suffered from {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket. \nIf their predicted points are low, prioritize transferring them.")
+    st.text(f"1. For players in their price bracket, {analysis.iloc[0][2]}, {analysis.iloc[1][2]} and {analysis.iloc[2][2]} have really not done well in the past 4 GW. \nIf their predicted points are low, prioritize transferring them.")
 else:
-    st.text(f"1. You should consider transferring {analysis.iloc[0][1]}, {analysis.iloc[1][1]} and {analysis.iloc[2][1]} as they are not doing well for players in their price bracket")
+    st.text(f"1. For players in their price bracket, {analysis.iloc[0][2]}, {analysis.iloc[1][2]} and {analysis.iloc[2][2]} are not doing too well in the past 4 GW.")
 
 analysis2 = weekly_table.loc[(weekly_table['Current Price'] >= 4.7) & (weekly_table['Prob. of Appearring'] <= 0.85) & (weekly_table['PP3_%_15'] < 0.5)].sort_values(['Prob. of Appearring','PP3_%_15','Current Price'],ascending=[True,True,False])
 
 if 1 >= len(analysis2) > 0:
-    st.text(f"2. You should particularly focus on transferring {analysis2.iloc[0][1]} as he has a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
+    st.text(f"2. That being said, you should particularly focus on transferring {analysis2.iloc[0][2]} as he has a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif 2 >= len(analysis2) > 0:
-    st.text(f"2. You should particularly focus on transferring {analysis2.iloc[0][1]} and {analysis2.iloc[1][1]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
+    st.text(f"2. That being said, you should particularly focus on transferring {analysis2.iloc[0][2]} and {analysis2.iloc[1][2]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif 3 >= len(analysis2) > 0:
-    st.text(f"2. You should particularly focus on transferring {analysis2.iloc[0][1]}, {analysis2.iloc[1][1]} and {analysis2.iloc[2][1]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
+    st.text(f"2. That being said, you should particularly focus on transferring {analysis2.iloc[0][2]}, {analysis2.iloc[1][2]} and {analysis2.iloc[2][2]} as they have a low probability of appearing and/or\nlow predicted points in the next 3 gameweeks")
 elif len(analysis2) > 3:
-    st.text("2. You should consider wildcarding, you have too many weak points in your team.")
+    st.text("2. That being said, you should consider wildcarding as you have too many weak points in your team.")
 elif len(analysis2) == 0:
     st.text(" ")
 
