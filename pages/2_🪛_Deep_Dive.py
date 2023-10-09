@@ -164,7 +164,7 @@ with col4:
 weekly_table = pd.merge(gameweek_data,master_table,how='left',left_on='element',right_on='ID')
 
 #%%
-weekly_table = weekly_table.drop([0])[['multiplier','element',
+weekly_table = weekly_table[['multiplier','element',
 'Name', 'Position', 'Team_x', 'Current Price',
 'Points Per Game', 'Event Points','Form', 'ICT Index','Penalties Order', 
 'Corners/ Indirect Order', 'Minutes', 'Influence', 'Creativity', 'Threat', 'Merit',
