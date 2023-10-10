@@ -608,7 +608,7 @@ if len(weekly_table_file) > 0  and len(new_data_file) >0:
     #st.write(updated_weekly_table_style)
 
     st.subheader('Updated Squad Selection')
-    options_to_show2 = updated_weekly_table[['Name', 'PP3_%_15', 'Position', 'Team_x',
+    options_to_show2 = updated_weekly_table.sort_values(['PP_GW'],ascending=False)[['Name', 'PP3_%_15', 'Position', 'Team_x',
                         'Current Price','Merit','PP_GW','Next_GW_%_15', 'PPNext2', 'PPNext3','Selected By %','Prob. of Appearring','Form','Threat','xG per 90', 'Creativity', 'xA per 90', 'xGA per 90','GW1_Diff','GW2_Diff','GW3_Diff','GW1_Home?','GW2_Home?','GW3_Home?']]    
     gridOptions3 = GridOptionsBuilder.from_dataframe(options_to_show2)
     gridOptions3.configure_column('Name', headerTooltip='Click hamburger to filter and select columns', pinned='left', 

@@ -449,12 +449,18 @@ AgGrid(
 # %%
 #Player To Transfer
 p =weekly_table_show.loc[(weekly_table_show['Current Price'] > 4.5) & (weekly_table_show['Prob. of Appearring'] <= 0.85)].sort_values(['PP3_%_15','Prob. of Appearring','Current Price'],ascending=[True,True,False])
-if len(p) > 0:
-    index_select = p.iloc[0].name - 1
-else:
-    index_select = weekly_table_show.iloc[0].name
-#index_select = index_select.tolist()
-index_select2 = weekly_table_show.iloc[1].name
+#if len(p) > 0:
+#    index_select = p.iloc[0].name
+#    index_select = index_select.astype(np.int32)
+#    #index_select = index_select.tolist()
+#else:
+#    index_select = weekly_table_show.iloc[0].name 
+#    index_select = index_select.astype(np.int32)
+#    #index_select = index_select.tolist()
+##index_select = index_select.tolist()
+#index_select2 = weekly_table_show.iloc[1].name
+##index_select2 = index_select2.astype(np.int32)
+##index_select2 = index_select2.tolist()
 
 st.subheader('Suggested Players To Transfer')
 
@@ -479,8 +485,8 @@ st.header('Step 2A: Assess potential replacements by selected players')
 #Ask for Player To Transfer
 player_to_transfer_1 = st.selectbox(
     '1st Player to Transfer',
-    list(weekly_table['Name']),
-    index=index_select
+    list(p['Name']) + list(weekly_table['Name']),
+    index=0
 )
 
 player_to_transfer_1_df = weekly_table[weekly_table['Name'] == player_to_transfer_1]
@@ -693,8 +699,8 @@ AgGrid(
 # %%
 player_to_transfer_2 = st.selectbox(
     '2nd Player to Transfer',
-    list(weekly_table['Name']),
-    index=index_select2
+    list(p['Name']) + list(weekly_table['Name']),
+    index=1
 )
 
 player_to_transfer_2_df = weekly_table[weekly_table['Name'] == player_to_transfer_2]
