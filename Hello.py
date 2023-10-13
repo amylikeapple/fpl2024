@@ -14,8 +14,6 @@ st.markdown(
     ### I don't have time, just optimize for me!
     - Go to Auto Optimizer
     - Just input your Team ID and how many players you are looking to transfer. How to find [Team ID](https://allaboutfpl.com/2023/07/what-is-team-id-in-fpl-how-to-get-a-low-fpl-team-id/)
-    - For players who are bench-warmers, select them as players to retain so the algorithm will not suggest to transfer them out
-    - Bonus -> If you are looking for differentials, you can define your maximum Selected By %
 
     ### I have too much time, I want to go through the process
     - Go to Deep Dive
